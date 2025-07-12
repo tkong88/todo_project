@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  web:
+    image: nginx:alpine
+    container_name: nginx_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx:/usr/share/nginx/html:ro
+  backend:
+    build: ./app
+    container_name: flask_backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/data
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_HOST=mongo
+  mongo:
+    image: mongo:5
+    container_name: mongo_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_admin
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+volumes:
+  mongo_data:
+
